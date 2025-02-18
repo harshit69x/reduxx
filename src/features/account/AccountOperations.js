@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { deposit, withdraw, requestLoan, payLoan } from "./accountSlice";
 
 function AccountOperations() {
   const [depositAmount, setDepositAmount] = useState("");
@@ -7,13 +9,34 @@ function AccountOperations() {
   const [loanPurpose, setLoanPurpose] = useState("");
   const [currency, setCurrency] = useState("USD");
 
-  function handleDeposit() {}
+  const dispatch = useDispatch();
+  const { loan: currentLoan, loanPurpose: currentLoanPurpose, balance } = useSelector(
+    (state) => state.account
+  );
 
-  function handleWithdrawal() {}
+  function handleDeposit() {
+    if (!depositAmount) return;
+    dispatch(deposit(depositAmount,currency)); // Ensure number input
+    setDepositAmount("");
+    setCurrency("");
+  }
 
-  function handleRequestLoan() {}
+  function handleWithdrawal() {
+    if (!withdrawalAmount) return;
+    dispatch(withdraw(Number(withdrawalAmount)));
+    setWithdrawalAmount("");
+  }
 
-  function handlePayLoan() {}
+  function handleRequestLoan() {
+    if (!loanAmount || !loanPurpose) return;
+    dispatch(requestLoan(Number(loanAmount), loanPurpose)); // Fix argument passing
+    setLoanPurpose("");
+    setLoanAmount("");
+  }
+
+  function handlePayLoan() {
+    if (currentLoan > 0) dispatch(payLoan());
+  }
 
   return (
     <div>
@@ -24,17 +47,13 @@ function AccountOperations() {
           <input
             type="number"
             value={depositAmount}
-            onChange={(e) => setDepositAmount(+e.target.value)}
+            onChange={(e) => setDepositAmount(Number(e.target.value))}
           />
-          <select
-            value={currency}
-            onChange={(e) => setCurrency(e.target.value)}
-          >
+          <select value={currency} onChange={(e) => setCurrency(e.target.value)}>
             <option value="USD">US Dollar</option>
             <option value="EUR">Euro</option>
             <option value="GBP">British Pound</option>
           </select>
-
           <button onClick={handleDeposit}>Deposit {depositAmount}</button>
         </div>
 
@@ -43,11 +62,9 @@ function AccountOperations() {
           <input
             type="number"
             value={withdrawalAmount}
-            onChange={(e) => setWithdrawalAmount(+e.target.value)}
+            onChange={(e) => setWithdrawalAmount(Number(e.target.value))}
           />
-          <button onClick={handleWithdrawal}>
-            Withdraw {withdrawalAmount}
-          </button>
+          <button onClick={handleWithdrawal}>Withdraw {withdrawalAmount}</button>
         </div>
 
         <div>
@@ -55,7 +72,7 @@ function AccountOperations() {
           <input
             type="number"
             value={loanAmount}
-            onChange={(e) => setLoanAmount(+e.target.value)}
+            onChange={(e) => setLoanAmount(Number(e.target.value))}
             placeholder="Loan amount"
           />
           <input
@@ -66,10 +83,12 @@ function AccountOperations() {
           <button onClick={handleRequestLoan}>Request loan</button>
         </div>
 
-        <div>
-          <span>Pay back $X</span>
-          <button onClick={handlePayLoan}>Pay loan</button>
-        </div>
+        {currentLoan > 0 && (
+          <div>
+            <span>Payback ${currentLoan} ({currentLoanPurpose})</span>
+            <button onClick={handlePayLoan}>Pay loan</button>
+          </div>
+        )}
       </div>
     </div>
   );

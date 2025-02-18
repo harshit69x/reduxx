@@ -10,7 +10,7 @@ const initialStateCustomer={
     nationalId:'',
     createdAt:''
 }
-function reducer(state = initialState, action) {
+function accountReducer(state = initialState, action) {
   switch (action.type) {
     case "account/deposit":
       return {
@@ -41,8 +41,28 @@ function reducer(state = initialState, action) {
       return state;
   }
 }
-
-const store = createStore(reducer);
+function customerReducer(state = initialStateCustomer, action) {
+    switch (action.type) {
+        case "customer/createCustomer":
+            return{
+                ...state,
+                fullName:action.payload.fullName,
+                nationalId:action.payload.nationalId,
+                createdAt:action.payload.createdAt
+            }
+        case 'customer/updateName':
+            return {
+                ...state,
+                fullName:action.payload
+            }
+        default:
+            return state
+}
+const rootReducer = combineReducers({
+    account: accountReducer,
+    customer: customerReducer,
+})
+const store = createStore(accountReducer);
 // store.dispatch({ type: "account/deposit", payload: 500 });
 // store.dispatch({ type: "account/withdraw", payload: 200 });
 // console.log(store.getState());

@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { createCustomer } from "./customerSlice";
 
 function Customer() {
   const [fullName, setFullName] = useState("");
   const [nationalId, setNationalId] = useState("");
+
   const dispatch = useDispatch();
-  const customer = useSelector((state) => state.customer); // ✅ Get customer state
 
   function handleClick() {
     if (!fullName || !nationalId) return;
@@ -33,15 +33,6 @@ function Customer() {
         </div>
         <button onClick={handleClick}>Create new customer</button>
       </div>
-
-      {/* ✅ Display customer details safely */}
-      {customer.fullName && (
-        <div>
-          <h3>Customer Details:</h3>
-          <p>Customer Name: {customer.fullName}</p>
-          <p>National ID: {customer.nationalId}</p>
-        </div>
-      )}
     </div>
   );
 }
